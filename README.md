@@ -19,6 +19,7 @@ No hardware required — timers, swimmers, and scoreboards are all simulated Go 
 | `lane` | Simulates one lane's touchpad: emits 25m splits and finish touch | UDP multicast send, NACK handling, clock sync |
 | `node` | Results cluster member: ingests splits, appends to WAL, replicates | UDP multicast receive, TCP server/client, heartbeats |
 | `board` | Terminal scoreboard: shows the live race and results | TCP client, leader discovery, reconnect |
+| `dump` | Debug tool: prints every decoded multicast packet (`-x` for raw bytes) | UDP multicast receive |
 
 ## Concepts demonstrated
 

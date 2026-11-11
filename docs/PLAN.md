@@ -5,9 +5,9 @@ Two weekends. Weekend 1 ends with a complete, demoable single-node system; weeke
 ## Weekend 1 — UDP, reliability, single node
 
 ### Sat AM — Wire format + multicast hello world
-- [ ] `internal/wire`: header + packet encode/decode with `encoding/binary`
-- [ ] Unit tests: round-trip every packet type; reject bad magic / short buffers
-- [ ] `cmd/starter` sends `START`; a throwaway listener joins `239.0.0.42:9999` and prints it
+- [x] `internal/wire`: header + packet encode/decode with `encoding/binary`
+- [x] Unit tests (+ fuzz test): round-trip every packet type; reject bad magic / short buffers
+- [x] `cmd/starter` sends `START`; `cmd/dump` joins `239.0.0.42:9999` and prints it
 - **Done when:** two terminals, one sends, one prints the decoded packet.
 - Gotcha: on macOS multicast may need an explicit interface (`net.ListenMulticastUDP("udp4", ifi, addr)`); try `lo0` or `en0`.
 
