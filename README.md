@@ -14,21 +14,40 @@ No hardware required — timers, swimmers, and scoreboards are all simulated Go 
 |---|---|
 | Binary wire format (all packet types), unit + fuzz tests | ✅ Done |
 | UDP multicast transport, `starter`, `dump` packet inspector | ✅ Done |
-| Simulated lanes + single results node | 🔨 In progress |
-| NACK-based loss recovery over UDP | ⏳ Planned |
+| Simulated lanes (bot pace model + manual spacebar mode), single results node | ✅ Done |
+| NACK-based loss recovery over UDP | 🔨 Next |
 | NTP-style clock sync | ⏳ Planned |
 | Write-ahead log + TCP framing + terminal scoreboard | ⏳ Planned |
 | 3-node replication, leader election, failover | ⏳ Planned |
 
 ### Try what works today
 
+Run a race on one machine (each command in its own terminal):
+
 ```bash
-# terminal 1: join the multicast group and print decoded packets (-x shows raw bytes)
-go run ./cmd/dump -x
+go run ./cmd/node                                    # results node: live splits + final results table
+go run ./cmd/lane --lane 1                           # bot swimmer (random pace ~13-15s per 25m)
+go run ./cmd/lane --lane 2 --pace 1s                 # fast bot, for a quick demo
+go run ./cmd/lane --lane 3 --swimmer manual          # you: press SPACE at each wall
+go run ./cmd/starter --race 1 --event "100 free"     # GO
+```
 
-# terminal 2: fire a race start
-go run ./cmd/starter --race 1 --event "100 free"
+Sample node output (bots at ~1s/25m):
 
+```
+RACE 1 · 100 free
+────────────────────────────────────────────
+PLACE  LANE   TIME       SPLITS
+1st    3      3.91       0.86 0.97 1.02 1.05
+2nd    1      3.96       0.89 0.99 1.01 1.05
+3rd    2      4.17       0.94 1.04 1.07 1.10
+────────────────────────────────────────────
+duplicates dropped so far: 2
+```
+
+`go run ./cmd/dump -x` shows every packet on the wire, with raw bytes.
+
+```bash
 # tests, including a fuzz test of the packet decoder
 go test ./...
 go test ./internal/wire -run '^$' -fuzz FuzzUnmarshal -fuzztime 30s

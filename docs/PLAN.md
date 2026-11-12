@@ -12,10 +12,11 @@ Two weekends. Weekend 1 ends with a complete, demoable single-node system; weeke
 - Gotcha: on macOS multicast may need an explicit interface (`net.ListenMulticastUDP("udp4", ifi, addr)`); try `lo0` or `en0`.
 
 ### Sat PM — Simulated lanes + basic node
-- [ ] `internal/swimmer`: pace model (base pace per 25m ± random variation, slight fade)
-- [ ] `cmd/lane --swimmer bot`: wait for `START`, emit `SPLIT` every 25m, `FINISH` at the end
-- [ ] `cmd/lane --swimmer manual`: spacebar = touch the wall
-- [ ] `cmd/node` (single node, no replication yet): receives packets, prints per-lane results
+- [x] `internal/swimmer`: pace model (base pace per 25m ± random variation, slight fade)
+- [x] `cmd/lane --swimmer bot`: wait for `START`, emit `SPLIT` every 25m, `FINISH` at the end
+- [x] `cmd/lane --swimmer manual`: spacebar = touch the wall
+- [x] `cmd/node` (single node, no replication yet): receives packets, prints per-lane results
+- [x] `internal/race`: idempotent, order-independent race state + standings (tested with shuffled/duplicated packets)
 - **Done when:** a 3-lane 100 free runs and the node prints correct final times.
 
 ### Sun AM — Reliability over UDP
