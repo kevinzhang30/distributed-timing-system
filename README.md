@@ -1,8 +1,38 @@
 # distributed-timing-system
 
+[![test](https://github.com/kevinzhang30/distributed-timing-system/actions/workflows/test.yml/badge.svg)](https://github.com/kevinzhang30/distributed-timing-system/actions/workflows/test.yml)
+
 A distributed swim meet timing system in Go. Lane timers broadcast splits over UDP multicast; a 3-node results cluster stores them in a replicated write-ahead log over a custom TCP protocol and survives leader failure; a terminal scoreboard follows races live.
 
 No hardware required — timers, swimmers, and scoreboards are all simulated Go processes.
+
+## Status
+
+🚧 **In active development.** The full design is specified in [docs/PROTOCOL.md](docs/PROTOCOL.md); progress is tracked in [docs/PLAN.md](docs/PLAN.md).
+
+| Milestone | Status |
+|---|---|
+| Binary wire format (all packet types), unit + fuzz tests | ✅ Done |
+| UDP multicast transport, `starter`, `dump` packet inspector | ✅ Done |
+| Simulated lanes + single results node | 🔨 In progress |
+| NACK-based loss recovery over UDP | ⏳ Planned |
+| NTP-style clock sync | ⏳ Planned |
+| Write-ahead log + TCP framing + terminal scoreboard | ⏳ Planned |
+| 3-node replication, leader election, failover | ⏳ Planned |
+
+### Try what works today
+
+```bash
+# terminal 1: join the multicast group and print decoded packets (-x shows raw bytes)
+go run ./cmd/dump -x
+
+# terminal 2: fire a race start
+go run ./cmd/starter --race 1 --event "100 free"
+
+# tests, including a fuzz test of the packet decoder
+go test ./...
+go test ./internal/wire -run '^$' -fuzz FuzzUnmarshal -fuzztime 30s
+```
 
 ## Architecture
 
@@ -30,7 +60,9 @@ No hardware required — timers, swimmers, and scoreboards are all simulated Go 
 - **Distributed storage** — write-ahead log, leader-based replication, majority commit, failover, follower catch-up
 - **Concurrency** — goroutine-per-connection, channels, `context` cancellation
 
-## Demo
+## Target demo
+
+When complete (see [Status](#status)), the full system runs like this:
 
 ```bash
 # terminal 1-3: results cluster
@@ -47,7 +79,7 @@ go run ./cmd/lane --lane 2 --swimmer bot
 go run ./cmd/lane --lane 3 --swimmer manual
 
 # start the race
-go run ./cmd/starter --event "100 free" --heat 1
+go run ./cmd/starter --event "100 free" --race 1
 ```
 
 Then break things:
